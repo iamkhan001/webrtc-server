@@ -17,17 +17,17 @@ webSocket.on('request',(req)=>{
     connection.on('message',(message)=>{
         const data = JSON.parse(message.utf8Data)
         console.log(data);
-        const user = findUser(data.name)
+        const userIndex = findUserIndex(data.name)
        
         switch(data.type){
             case "store_user":
-                if(user !=null){
+                if(userIndex > -1){
                     //our user exists
+                    users[userIndex].conn = connection;
                     connection.send(JSON.stringify({
-                        type:'user already exists'
+                        type:'user updated'
                     }))
-                    return
-
+                    return;
                 }
 
                 const newUser = {
@@ -113,4 +113,13 @@ const findUser = username =>{
         if(users[i].name === username)
         return users[i]
     }
+}
+
+const findUserIndex = username =>{
+    for(let i=0; i<users.length;i++){
+        if(users[i].name === username) {
+            return i;
+        }
+    }
+    return -1;
 }
